@@ -40,6 +40,8 @@ namespace HCF_Calculation
         List<double> xd = new List<double>();//Derivative x and y
         List<double> yd = new List<double>();
         string asa = "";
+
+
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
         {
 
@@ -86,8 +88,6 @@ namespace HCF_Calculation
                 int a = xs.Length;
 
 
-
-
                 for (int i = 0; i < a; i++)
                 {
 
@@ -103,17 +103,20 @@ namespace HCF_Calculation
                 var y = yl.ToArray().ToVector();
 
 
-
                 int maxindex = x.MaxIndex();
                 int minindex = x.MinIndex();
+
 
                 int sp = maxindex;
                 int ep = minindex;
 
+
                 if (minindex < maxindex)
                 {
+
                     sp = minindex;
                     ep = maxindex;
+
                 }
 
                 //var xc = x.Concat(x).ToArray().ToVector();
@@ -121,18 +124,14 @@ namespace HCF_Calculation
 
                 for (int i = sp; i < a; i++)
                 {
-
                     x1.Add(x[i]);
                     y1.Add(y[i]);
-
                 }
 
                 for (int i = sp; i >= 0; i--)
                 {
-
                     x2.Add(x[i]);
                     y2.Add(y[i]);
-
                 }
 
                 //x2.Add(x[ep]);
@@ -180,37 +179,64 @@ namespace HCF_Calculation
                 LinearCurveFitter fitter7 = new LinearCurveFitter();
                 LinearCurveFitter fitter8 = new LinearCurveFitter();
 
+
                 fitter1.Curve = new Polynomial(1);
                 fitter2.Curve = new Polynomial(2);
                 fitter3.Curve = new Polynomial(3);
                 fitter4.Curve = new Polynomial(4);
+
+
                 fitter5.Curve = new Polynomial(5);
                 fitter6.Curve = new Polynomial(6);
                 fitter7.Curve = new Polynomial(7);
-                fitter8.Curve = new Polynomial(8);
+                fitter8.Curve = new Polynomial(6);
 
-                for (int i = range + 1; i < (x1v.Length - range - 2); i++)
+
+                for (int i = 0; i<range; i++ )
+                {
+                    aranan = x1v[i];
+                    arac = (Extreme.Mathematics.LinearAlgebra.DenseVector<double>)(x2v - finder * aranan);
+                    int indis = arac.AbsoluteMinIndex();
+                   
+
+                }
+
+
+                for (int i = 0; i < x1v.Length; i++)
                 {
 
                     aranan = x1v[i];
                     arac = (Extreme.Mathematics.LinearAlgebra.DenseVector<double>)(x2v - finder * aranan);
                     int indis = arac.AbsoluteMinIndex();
-                    if (indis < range || (indis + range) > (x2v.Length - 1))
+                    if (indis < range )
                     {
 
-                        range--;
+                        
 
                         for (int j = 0; j <= (2 * range); j++)
                         {
 
-                            xvalue[j] = x2v[indis + j - range];
-                            yvalue[j] = y2v[indis + j - range];
+                            xvalue[j] = x2v[ j ];
+                            yvalue[j] = y2v[ j ];
 
                         }
 
-                        range++;
+                        
 
                     }
+                    else if ((indis + range) > (x2v.Length - 1))
+
+                    {
+                        for (int j = 0; j <= (2 * range); j++)
+                        {
+                            
+                            xvalue[j] = x2v[x2v.Length - 2 * range - 1+j];
+                            yvalue[j] = y2v[x2v.Length - 2 * range - 1+j];
+
+                        }
+
+                    }
+
                     else
                     {
                         for (int j = 0; j <= (2 * range); j++)
@@ -229,13 +255,13 @@ namespace HCF_Calculation
 
                     //xvalue = Vector.Create<double>(8,5,6,4,7,5);
 
-                    for (int j = 0; j <= (2 * range); j++)
-                    {
+                    //for (int j = 0; j <= (2 * range); j++)
+                    //{
 
-                        xvalue[j] = x2v[indis + j - range];
-                        yvalue[j] = y2v[indis + j - range];
+                    //    xvalue[j] = x2v[indis + j - range];
+                    //    yvalue[j] = y2v[indis + j - range];
 
-                    }
+                    //}
 
 
                     //xvalue = x2.ToArray().Skip(indis - 3).Take(indis + 3).ToArray();
@@ -336,19 +362,22 @@ namespace HCF_Calculation
                 //After that calculate average and dy/dx curve
 
 
-                var displacement1 = chart1.Series[0];
-                displacement1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-                displacement1.Points.DataBindXY(x1v.ToArray(), y1v.ToArray());
+                var curve1 = chart1.Series[0];
+                curve1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+                curve1.Points.DataBindXY(x1v.ToArray(), y1v.ToArray());
+
+                var curve2 = chart1.Series[1];
+                curve2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+                curve2.Points.DataBindXY(x2v.ToArray(), y2v.ToArray());
+
+                var curve3 = chart1.Series[2];
+                curve3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+                curve3.Points.DataBindXY(xav.ToArray(), yav.ToArray());
 
 
-                var displacement2 = chart1.Series[1];
-                displacement2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-                displacement2.Points.DataBindXY(x1v.ToArray(), yfv.ToArray());
-
-
-                var displacement3 = chart1.Series[2];
-                displacement3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-                displacement3.Points.DataBindXY(x1v.ToArray(), yav.ToArray());
+                var curve4 = chart1.Series[3];
+                curve4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+                curve4.Points.DataBindXY(xfv.ToArray(), yfv.ToArray());
             }
             else
             {
@@ -429,9 +458,11 @@ namespace HCF_Calculation
         {
 
             // Define Charts
-            var displacement1 = chart1.Series.Add("Anvil Table");
-            var displacement2 = chart1.Series.Add("Equipment");
-            var displacement3 = chart1.Series.Add("Average");
+            var curve1 = chart1.Series.Add("Loading");
+            var curve2 = chart1.Series.Add("Rebound");
+            var curve3 = chart1.Series.Add("Average");
+            var curve4 = chart1.Series.Add("Stiffness");
+           
 
         }
 
