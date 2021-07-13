@@ -159,6 +159,7 @@ namespace HCF_Calculation
                 var y2v = y2.ToArray().ToVector();
                 var yav = ya.ToArray().ToVector();
                 var yfv = yf.ToArray().ToVector();
+                var ysv = yf.ToArray().ToVector();
                 var residual = Vector.Create<double>(8);
                 var finder = x2.ToArray().ToVector();
                 var arac = x2.ToArray().ToVector();
@@ -314,8 +315,8 @@ namespace HCF_Calculation
 
 
                     int bestfit = residual.ToArray().MinIndex();
-                    yfv[i] = fitter8.Curve.GetDerivative().ValueAt(xfv[i]);
-
+                    yfv[i] = fitter8.Curve.ValueAt(xfv[i]);
+                    ysv[i] = fitter8.Curve.GetDerivative().ValueAt(xfv[i]);
 
                     /*
                     if (i==0)
@@ -372,12 +373,12 @@ namespace HCF_Calculation
 
                 var curve3 = chart1.Series[2];
                 curve3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-                curve3.Points.DataBindXY(xav.ToArray(), yav.ToArray());
+                curve3.Points.DataBindXY(x1v.ToArray(), yav.ToArray());
 
 
                 var curve4 = chart1.Series[3];
                 curve4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-                curve4.Points.DataBindXY(xfv.ToArray(), yfv.ToArray());
+                curve4.Points.DataBindXY(xfv.ToArray(), ysv.ToArray());
             }
             else
             {
