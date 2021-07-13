@@ -68,21 +68,38 @@ namespace HCF_Calculation
                             dtc = result.Tables;
                             comboBox1.Items.Clear();
                             foreach (DataTable table in dtc) comboBox1.Items.Add(table.TableName);
+                            
                         }
 
                     }
 
                 }
 
+
+            }
+            if (textBox1.Text!=null)
+            {
+                button2.Enabled = true;
+            }
+            else
+            {
+                button2.Enabled = false;
             }
 
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            if(comboBox1.SelectedIndex!= null && comboBox1.SelectedIndex>=0)
-            {
-                DataTable dt = dtc[comboBox1.SelectedIndex];
+
+
+
+            //DataTable dt = dtc[comboBox1.SelectedIndex];
+            //dataGridView1.DataSource = dt;
+            //dataGridView1.Columns[0].HeaderText = "Displacement";
+            //dataGridView1.Columns[1].HeaderText = "Force";
+            
+
+            DataTable dt = dtc[0];
                 string[] xs = dt.Rows.OfType<DataRow>().Select(k => k[0].ToString()).ToArray();
                 string[] ys = dt.Rows.OfType<DataRow>().Select(k => k[1].ToString()).ToArray();
                 int a = xs.Length;
@@ -379,12 +396,7 @@ namespace HCF_Calculation
                 var curve4 = chart1.Series[3];
                 curve4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
                 curve4.Points.DataBindXY(xfv.ToArray(), ysv.ToArray());
-            }
-            else
-            {
-                MessageBox.Show("Kolon seç", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                
-            }
+            
 
            
 
@@ -446,7 +458,7 @@ namespace HCF_Calculation
             deflectionData = Vector.Create<double>(0, 0.5, 1, 1.5, 2);
             loadData = deflectionData; 
 
-            textBox2.Text = Convert.ToString(c1)+"  "+ Convert.ToString(c2) +"  " +Convert.ToString(c3);
+           // textBox2.Text = Convert.ToString(c1)+"  "+ Convert.ToString(c2) +"  " +Convert.ToString(c3);
             var deflectionData1 = deflectionData; 
             var displacement2 = chart1.Series[1];
 
@@ -492,7 +504,7 @@ namespace HCF_Calculation
                 {
                     var yVal = result.ChartArea.AxisY.PixelPositionToValue(pos.Y);
                     var xVal = result.ChartArea.AxisX.PixelPositionToValue(pos.X);
-                    tooltip.Show(((double)yVal).ToString()+"-"+ ((double)xVal).ToString(), chart1, pos.X, pos.Y - 15);
+                    tooltip.Show(((double)xVal).ToString("0.###")+" , "+ ((double)yVal).ToString("0.###"), chart1, pos.X, pos.Y - 15);
                 }
             }
         }
