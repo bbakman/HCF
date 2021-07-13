@@ -1,0 +1,13 @@
+C:\Users\bakman\Desktop\BBA_Repo\HCF\obj\Release\HCF_Calculation.csproj.AssemblyReference.cache
+C:\Users\bakman\Desktop\BBA_Repo\HCF\obj\Release\HCF_Calculation.csproj.ResolveComReference.cache
+C:\Users\bakman\Desktop\BBA_Repo\HCF\obj\Release\HCF_Calculation.Form1.resources
+C:\Users\bakman\Desktop\BBA_Repo\HCF\obj\Release\HCF_Calculation.Properties.Resources.resources
+C:\Users\bakman\Desktop\BBA_Repo\HCF\obj\Release\HCF_Calculation.csproj.GenerateResource.cache
+C:\Users\bakman\Desktop\BBA_Repo\HCF\obj\Release\HCF_Calculation.csproj.CoreCompileInputs.cache
+C:\Users\bakman\Desktop\BBA_Repo\HCF\obj\Release\Interop.DataManager2.dll
+C:\Users\bakman\Desktop\BBA_Repo\HCF\obj\Release\Interop.DEWESoft.dll
+C:\Users\bakman\Desktop\BBA_Repo\HCF\bin\Release\HCF_Calculation.exe.config
+C:\Users\bakman\Desktop\BBA_Repo\HCF\bin\Release\HCF_Calculation.exe
+C:\Users\bakman\Desktop\BBA_Repo\HCF\bin\Release\HCF_Calculation.pdb
+C:\Users\bakman\Desktop\BBA_Repo\HCF\obj\Release\HCF_Calculation.exe
+C:\Users\bakman\Desktop\BBA_Repo\HCF\obj\Release\HCF_Calculation.pdb
