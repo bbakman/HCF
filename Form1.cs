@@ -21,9 +21,7 @@ namespace HCF_Calculation
     {
         public Form1()
         {
-
-            InitializeComponent();
-            
+            InitializeComponent();            
         }
         
         DataTableCollection dtc;
@@ -39,16 +37,7 @@ namespace HCF_Calculation
         List<double> ya = new List<double>();
         List<double> xd = new List<double>();//Derivative x and y
         List<double> yd = new List<double>();
-        string asa = "";
-
-
-        private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
-        {
-
-            
-
-        }
-         
+       
         private void Button1_Click(object sender, EventArgs e)
         {
             using(OpenFileDialog openfile = new OpenFileDialog())
@@ -67,16 +56,12 @@ namespace HCF_Calculation
                             }) ;
                             dtc = result.Tables;
                             comboBox1.Items.Clear();
-                            foreach (DataTable table in dtc) comboBox1.Items.Add(table.TableName);
-                            
+                            foreach (DataTable table in dtc) comboBox1.Items.Add(table.TableName);                            
                         }
-
                     }
-
                 }
-
-
             }
+            //
             if (textBox1.Text!=null)
             {
                 button2.Enabled = true;
@@ -85,44 +70,26 @@ namespace HCF_Calculation
             {
                 button2.Enabled = false;
             }
-
         }
 
         private void button2_Click(object sender, EventArgs e)
-        {
-
-
-
-            //DataTable dt = dtc[comboBox1.SelectedIndex];
-            //dataGridView1.DataSource = dt;
-            //dataGridView1.Columns[0].HeaderText = "Displacement";
-            //dataGridView1.Columns[1].HeaderText = "Force";
-            
-
-            DataTable dt = dtc[0];
+        {          
+                DataTable dt = dtc[0];
                 string[] xs = dt.Rows.OfType<DataRow>().Select(k => k[0].ToString()).ToArray();
                 string[] ys = dt.Rows.OfType<DataRow>().Select(k => k[1].ToString()).ToArray();
                 int a = xs.Length;
 
-
                 for (int i = 0; i < a; i++)
                 {
-
-
                     xl.Add(Convert.ToDouble(xs[i]));
                     yl.Add(Convert.ToDouble(ys[i]));
-
-
                 }
-
 
                 var x = xl.ToArray().ToVector();
                 var y = yl.ToArray().ToVector();
 
-
                 int maxindex = x.MaxIndex();
                 int minindex = x.MinIndex();
-
 
                 int sp = maxindex;
                 int ep = minindex;
@@ -130,15 +97,10 @@ namespace HCF_Calculation
 
                 if (minindex < maxindex)
                 {
-
                     sp = minindex;
                     ep = maxindex;
-
                 }
-
-                //var xc = x.Concat(x).ToArray().ToVector();
-                //var yc = y.Concat(y).ToArray().ToVector();
-
+               
                 for (int i = sp; i < a; i++)
                 {
                     x1.Add(x[i]);
@@ -149,18 +111,11 @@ namespace HCF_Calculation
                 {
                     x2.Add(x[i]);
                     y2.Add(y[i]);
-                }
-
-                //x2.Add(x[ep]);
-                //y2.Add(y[ep]);
-
-                //Refit the with polynomial aproximation
+                }               
 
                 xf = x1;
                 yf = y1;
-
-                //Define fitting parameters
-
+                           
                 double dp;          //Degree of polinom
                 double percentile = 1;  //Percentage of previous and next data
 
@@ -176,6 +131,7 @@ namespace HCF_Calculation
                 var y2v = y2.ToArray().ToVector();
                 var yav = ya.ToArray().ToVector();
                 var yfv = yf.ToArray().ToVector();
+
                 var ysv = yf.ToArray().ToVector();
                 var residual = Vector.Create<double>(8);
                 var finder = x2.ToArray().ToVector();
@@ -265,228 +221,43 @@ namespace HCF_Calculation
 
                         }
 
-                    }
-
-                    //LinearCurveFitter fitter = new LinearCurveFitter();
-
-                    //fitter.Curve = new Polynomial(6);
-
-                    //xvalue = Vector.Create<double>(8,5,6,4,7,5);
-
-                    //for (int j = 0; j <= (2 * range); j++)
-                    //{
-
-                    //    xvalue[j] = x2v[indis + j - range];
-                    //    yvalue[j] = y2v[indis + j - range];
-
-                    //}
-
-
-                    //xvalue = x2.ToArray().Skip(indis - 3).Take(indis + 3).ToArray();
-                    //yvalue = y2.ToArray().Skip(indis - 3).Take(indis + 3).ToArray();
-
-
-                    fitter1.XValues = xvalue;
-                    fitter1.YValues = yvalue;
-                    fitter2.XValues = xvalue;
-                    fitter2.YValues = yvalue;
-
-                    fitter3.XValues = xvalue;
-                    fitter3.YValues = yvalue;
-                    fitter4.XValues = xvalue;
-                    fitter4.YValues = yvalue;
-
-                    fitter5.XValues = xvalue;
-                    fitter5.YValues = yvalue;
-                    fitter6.XValues = xvalue;
-                    fitter6.YValues = yvalue;
-
-                    fitter7.XValues = xvalue;
-                    fitter7.YValues = yvalue;
+                    }      
+                    
                     fitter8.XValues = xvalue;
-                    fitter8.YValues = yvalue;
+                    fitter8.YValues = yvalue;                    
+                    fitter8.Fit();                  
 
-
-                    fitter1.Fit();
-                    fitter2.Fit();
-                    fitter3.Fit();
-                    fitter4.Fit();
-
-
-                    fitter5.Fit();
-                    fitter6.Fit();
-                    fitter7.Fit();
-                    fitter8.Fit();
-
-
-                    residual[0] = fitter1.Residuals.Norm();
-                    residual[1] = fitter2.Residuals.Norm();
-                    residual[2] = fitter3.Residuals.Norm();
-                    residual[3] = fitter4.Residuals.Norm();
-
-
-                    residual[4] = fitter5.Residuals.Norm();
-                    residual[5] = fitter6.Residuals.Norm();
-                    residual[6] = fitter7.Residuals.Norm();
-                    residual[7] = fitter8.Residuals.Norm();
-
-
-                    int bestfit = residual.ToArray().MinIndex();
                     yfv[i] = fitter8.Curve.ValueAt(xfv[i]);
                     ysv[i] = fitter8.Curve.GetDerivative().ValueAt(xfv[i]);
-
-                    /*
-                    if (i==0)
-                    { 
-                        yfv[i] = fitter1.Curve.GetDerivative().ValueAt(xfv[i]);
-                    }
-                    else if (i==1)
-                    {
-                        yfv[i] = fitter2.Curve.GetDerivative().ValueAt(xfv[i]);
-                    }
-                    else if (i==2)
-                    {
-                        yfv[i] = fitter3.Curve.GetDerivative().ValueAt(xfv[i]);
-                    }
-                    else if (i==3)
-                    {
-                        yfv[i] = fitter4.Curve.GetDerivative().ValueAt(xfv[i]);
-                    }
-                    else if (i==4)
-                    {
-                        yfv[i] = fitter5.Curve.GetDerivative().ValueAt(xfv[i]);
-                    }
-                    else if (i==5)
-                    {
-                        yfv[i] = fitter6.Curve.GetDerivative().ValueAt(xfv[i]);
-                    }
-                    else if (i==6)
-                    {
-                        yfv[i] = fitter7.Curve.GetDerivative().ValueAt(xfv[i]);
-                    }
-                    else if (i==7)
-                    {
-                        yfv[i] = fitter8.Curve.GetDerivative().ValueAt(xfv[i]);
-                    }        
-                    */
+                                    
                 }
 
-
                 yav = (Extreme.Mathematics.LinearAlgebra.DenseVector<double>)((yfv + y1v) / 2);
-
-
-                //Top curve and bottom curve data is ready here
-
-                //After that calculate average and dy/dx curve
-
 
                 var curve1 = chart1.Series[0];
                 curve1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
                 curve1.Points.DataBindXY(x1v.ToArray(), y1v.ToArray());
-
                 var curve2 = chart1.Series[1];
                 curve2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
                 curve2.Points.DataBindXY(x2v.ToArray(), y2v.ToArray());
-
                 var curve3 = chart1.Series[2];
                 curve3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
                 curve3.Points.DataBindXY(x1v.ToArray(), yav.ToArray());
-
-
                 var curve4 = chart1.Series[3];
                 curve4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-                curve4.Points.DataBindXY(xfv.ToArray(), ysv.ToArray());
-            
+                curve4.Points.DataBindXY(xfv.ToArray(), ysv.ToArray());       
 
-           
-
-        }
-
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            DataTable dt = dtc[comboBox1.SelectedIndex];
-            dataGridView1.DataSource = dt;
-            dataGridView1.Columns[0].HeaderText = "Displacement";
-            dataGridView1.Columns[1].HeaderText = "Force";
-            
-        }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-            LinearCurveFitter fitter = new LinearCurveFitter();
-            var ones = Vector.Create<double>(1, 1, 1, 1, 1, 1, 1, 1);
-            var deflectionData = Vector.Create<double>(1,5,2,0,3,6, 1, 5, 2, 0, 3, 6, 1, 5, 2, 0, 3, 6);
-            var loadData = Vector.Create<double>(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17);
-            fitter.Curve = new Polynomial(10);
-            fitter.XValues = loadData; 
-            fitter.YValues = deflectionData;
-            //fitter.WeightFunction = WeightFunctions.OneOverXSquared;
-            fitter.Fit();
-            
-
-            var displacement1 = chart1.Series[0];
-
-            displacement1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-
-            displacement1.Points.DataBindXY(loadData.ToArray(), deflectionData.ToArray());
-            
-            var solution = fitter.BestFitParameters;
-            Polynomial polynom1 = new Polynomial(3);
-
-
-            polynom1[2] = 1;
-            polynom1[1] = -5;
-            polynom1[0] = 0;
-            var x = new linspace();
-            x.series(0, 20, 5);
-            textBox1.Text = polynom1.ValueAt(2).ToString();
-            Curve derivative = polynom1.GetDerivative();
-            double c1 = solution[0];
-            double c2 = solution[1];
-            double c3 = solution[2];
-            double c4 = solution[3];
-            var s = fitter.GetStandardDeviations();
-            s = x.series(0, 50, 1000);
-            var y = s.Sin()+(2*s).Cos();
-            Console.WriteLine("Solution (weighted observations):");
-            Console.WriteLine("c1: {0,20:E10} {1,20:E10}", solution[0], s[0]);
-            Console.WriteLine("c2: {0,20:E10} {1,20:E10}", solution[1], s[1]);
-            Console.WriteLine("c3: {0,20:E10} {1,20:E10}", solution[2], s[2]);
-            Console.WriteLine("c4: {0,20:E10} {1,20:E10}", solution[3], s[3]);
-            Console.WriteLine("c5: {0,20:E10} {1,20:E10}", solution[4], s[4]);
-            
-            deflectionData = Vector.Create<double>(0, 0.5, 1, 1.5, 2);
-            loadData = deflectionData; 
-
-           // textBox2.Text = Convert.ToString(c1)+"  "+ Convert.ToString(c2) +"  " +Convert.ToString(c3);
-            var deflectionData1 = deflectionData; 
-            var displacement2 = chart1.Series[1];
-
-             
-            displacement2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            displacement2.Points.DataBindXY(s.ToArray(), y.ToArray());
-        }
-
+        }             
         private void Form1_Load(object sender, EventArgs e)
         {
-
-            // Define Charts
-            var curve1 = chart1.Series.Add("Loading");
+            var curve1 = chart1.Series.Add("Load");
             var curve2 = chart1.Series.Add("Rebound");
             var curve3 = chart1.Series.Add("Average");
             var curve4 = chart1.Series.Add("Stiffness");
-           
-
         }
 
-        private void button4_Click(object sender, EventArgs e)
-        {
-               string clipboardText = Clipboard.GetText(TextDataFormat.Text);
-               dataGridView1.DataSource = clipboardText;
-               // dataGridView1.Columns[0].HeaderText = "Displacement";
-               // dataGridView1.Columns[1].HeaderText = "Force"; 
-               // Do whatever you need to do with clipboardText
-        }
+        
+
         System.Drawing.Point? prevPosition = null;
         ToolTip tooltip = new ToolTip();
 
