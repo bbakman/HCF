@@ -23,29 +23,31 @@ namespace HCF_Calculation
         {
             InitializeComponent();            
         }
-        
+        //Defining Lists
         DataTableCollection dtc;
         List<double> xl = new List<double>();
         List<double> yl = new List<double>();
-        List<double> x1 = new List<double>();//Top x and y
+        List<double> x1 = new List<double>();//Loading x and y
         List<double> y1 = new List<double>();
-        List<double> x2 = new List<double>();//Bottom x and y
+        List<double> x2 = new List<double>();//Rebound x and y
         List<double> y2 = new List<double>(); 
-        List<double> xf = new List<double>();//Fittet x and y
+        List<double> xf = new List<double>();//Fitted Rebound x and y
         List<double> yf = new List<double>();
         List<double> xa = new List<double>();//Average x and y
         List<double> ya = new List<double>();
-        List<double> xd = new List<double>();//Derivative x and y
-        List<double> yd = new List<double>();
+        List<double> xs = new List<double>();//Stiffness x and y
+        List<double> ys = new List<double>();
        
+        
         private void Button1_Click(object sender, EventArgs e)
         {
+            //Select File Button
+            //Standart Excel Read Code
             using(OpenFileDialog openfile = new OpenFileDialog())
             {
                 if(openfile.ShowDialog()==DialogResult.OK)
                 {
                     textBox1.Text = openfile.FileName;
-
                     using (var stream = File.Open(openfile.FileName, FileMode.Open, FileAccess.Read))
                     {
                         using (IExcelDataReader excelreader = ExcelDataReader.ExcelReaderFactory.CreateReader(stream))
@@ -54,14 +56,12 @@ namespace HCF_Calculation
                             {
                                 ConfigureDataTable = (x) => new ExcelDataTableConfiguration() { UseHeaderRow = false }
                             }) ;
-                            dtc = result.Tables;
-                            comboBox1.Items.Clear();
-                            foreach (DataTable table in dtc) comboBox1.Items.Add(table.TableName);                            
+                            dtc = result.Tables;                                                      
                         }
                     }
                 }
             }
-            //
+            //Boolean Operation for button 
             if (textBox1.Text!=null)
             {
                 button2.Enabled = true;
@@ -71,42 +71,37 @@ namespace HCF_Calculation
                 button2.Enabled = false;
             }
         }
-
         private void button2_Click(object sender, EventArgs e)
-        {          
+        {       //Create Data Table   
                 DataTable dt = dtc[0];
+                //Separate Stiffness and 
                 string[] xs = dt.Rows.OfType<DataRow>().Select(k => k[0].ToString()).ToArray();
                 string[] ys = dt.Rows.OfType<DataRow>().Select(k => k[1].ToString()).ToArray();
-                int a = xs.Length;
+                int datalenght = xs.Length;
 
-                for (int i = 0; i < a; i++)
+                for (int i = 0; i < datalenght; i++)
                 {
                     xl.Add(Convert.ToDouble(xs[i]));
                     yl.Add(Convert.ToDouble(ys[i]));
                 }
-
+                //List to vector for mathemtical operations
                 var x = xl.ToArray().ToVector();
                 var y = yl.ToArray().ToVector();
-
-                int maxindex = x.MaxIndex();
-                int minindex = x.MinIndex();
-
+                
+                int maxindex = x.MaxIndex();//İndex of max values measurement
+                int minindex = x.MinIndex();//İndex of min values measurement
                 int sp = maxindex;
-                int ep = minindex;
-
-
+                //Detecting turn point of data it would be min value or max value so that we need boolean operations
                 if (minindex < maxindex)
                 {
-                    sp = minindex;
-                    ep = maxindex;
+                    sp = minindex;                    
                 }
-               
-                for (int i = sp; i < a; i++)
+                //Creating new vectors from starting points
+                for (int i = sp; i < datalenght; i++)
                 {
                     x1.Add(x[i]);
                     y1.Add(y[i]);
                 }
-
                 for (int i = sp; i >= 0; i--)
                 {
                     x2.Add(x[i]);
@@ -115,13 +110,11 @@ namespace HCF_Calculation
 
                 xf = x1;
                 yf = y1;
-                           
-                double dp;          //Degree of polinom
+
+                int dp = 6;          //Degree of polinom
                 double percentile = 1;  //Percentage of previous and next data
 
-                //List<double> xvalue = new List<double>(7);
-                //List<double> yvalue = new List<double>(7);
-
+                //List to vector
                 var x1v = x1.ToArray().ToVector();
                 var x2v = x2.ToArray().ToVector();
                 var xav = xa.ToArray().ToVector();
@@ -132,108 +125,70 @@ namespace HCF_Calculation
                 var yav = ya.ToArray().ToVector();
                 var yfv = yf.ToArray().ToVector();
 
-                var ysv = yf.ToArray().ToVector();
-                var residual = Vector.Create<double>(8);
+                var ysv = yf.ToArray().ToVector();               
                 var finder = x2.ToArray().ToVector();
                 var arac = x2.ToArray().ToVector();
-                double aranan;
-                finder.SetValue(1);
-                int range = ((int)(a * percentile / 100));
-                //arac = (Extreme.Mathematics.LinearAlgebra.DenseVector<double>)(x2v - finder * aranan);
-                //int indis = arac.AbsoluteMinIndex(); 
+                double wanted;//
+                finder.SetValue(1);//Change to all value to 1 such as ones() in matlab
+                int range = ((int)(datalenght * percentile / 100));
+                //Define data segment for polynomial fitting from percentile of data parameter
                 var xvalue = Vector.Create<double>(range * 2 + 1);
                 var yvalue = Vector.Create<double>(range * 2 + 1);
 
-                LinearCurveFitter fitter1 = new LinearCurveFitter();
-                LinearCurveFitter fitter2 = new LinearCurveFitter();
-                LinearCurveFitter fitter3 = new LinearCurveFitter();
-                LinearCurveFitter fitter4 = new LinearCurveFitter();
-                LinearCurveFitter fitter5 = new LinearCurveFitter();
-                LinearCurveFitter fitter6 = new LinearCurveFitter();
-                LinearCurveFitter fitter7 = new LinearCurveFitter();
-                LinearCurveFitter fitter8 = new LinearCurveFitter();
-
-
-                fitter1.Curve = new Polynomial(1);
-                fitter2.Curve = new Polynomial(2);
-                fitter3.Curve = new Polynomial(3);
-                fitter4.Curve = new Polynomial(4);
-
-
-                fitter5.Curve = new Polynomial(5);
-                fitter6.Curve = new Polynomial(6);
-                fitter7.Curve = new Polynomial(7);
-                fitter8.Curve = new Polynomial(6);
+                //Create curve fitter
+                LinearCurveFitter fitter = new LinearCurveFitter();
+                //Define ploynamial curve fitting from given value
+                fitter.Curve = new Polynomial(dp);
 
 
                 for (int i = 0; i<range; i++ )
                 {
-                    aranan = x1v[i];
-                    arac = (Extreme.Mathematics.LinearAlgebra.DenseVector<double>)(x2v - finder * aranan);
-                    int indis = arac.AbsoluteMinIndex();
-                   
-
+                    wanted = x1v[i];
+                    //arac is using for lookup table method
+                    //x2v=[5,4,,2,9,6] 
+                    //wanted = 8;
+                    //abs([5,4,2,9,6]-[1,1,1,1,1]*8)=[3,4,6,1,2]
+                    //min index 4 we use 4 for looking to x2v
+                    arac = (Extreme.Mathematics.LinearAlgebra.DenseVector<double>)(x2v - finder * wanted);
+                    int indis = arac.AbsoluteMinIndex();               
                 }
-
-
                 for (int i = 0; i < x1v.Length; i++)
                 {
-
-                    aranan = x1v[i];
-                    arac = (Extreme.Mathematics.LinearAlgebra.DenseVector<double>)(x2v - finder * aranan);
+                    wanted = x1v[i];
+                    arac = (Extreme.Mathematics.LinearAlgebra.DenseVector<double>)(x2v - finder * wanted);
                     int indis = arac.AbsoluteMinIndex();
                     if (indis < range )
-                    {
-
-                        
-
+                    {                      
                         for (int j = 0; j <= (2 * range); j++)
                         {
-
                             xvalue[j] = x2v[ j ];
                             yvalue[j] = y2v[ j ];
-
-                        }
-
-                        
-
+                        }              
                     }
                     else if ((indis + range) > (x2v.Length - 1))
-
                     {
                         for (int j = 0; j <= (2 * range); j++)
-                        {
-                            
+                        {                            
                             xvalue[j] = x2v[x2v.Length - 2 * range - 1+j];
                             yvalue[j] = y2v[x2v.Length - 2 * range - 1+j];
-
                         }
-
                     }
-
                     else
                     {
                         for (int j = 0; j <= (2 * range); j++)
                         {
-
                             xvalue[j] = x2v[indis + j - range];
                             yvalue[j] = y2v[indis + j - range];
-
                         }
-
-                    }      
-                    
-                    fitter8.XValues = xvalue;
-                    fitter8.YValues = yvalue;                    
-                    fitter8.Fit();                  
-
-                    yfv[i] = fitter8.Curve.ValueAt(xfv[i]);
-                    ysv[i] = fitter8.Curve.GetDerivative().ValueAt(xfv[i]);
-                                    
+                    }                          
+                    fitter.XValues = xvalue;
+                    fitter.YValues = yvalue;                    
+                    fitter.Fit();                  
+                    yfv[i] = fitter.Curve.ValueAt(xfv[i]);
+                    ysv[i] = fitter.Curve.GetDerivative().ValueAt(xfv[i]);                                    
                 }
-
+                //Average of Loading and Rebound Data
                 yav = (Extreme.Mathematics.LinearAlgebra.DenseVector<double>)((yfv + y1v) / 2);
-
                 var curve1 = chart1.Series[0];
                 curve1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
                 curve1.Points.DataBindXY(x1v.ToArray(), y1v.ToArray());
@@ -243,39 +198,37 @@ namespace HCF_Calculation
                 var curve3 = chart1.Series[2];
                 curve3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
                 curve3.Points.DataBindXY(x1v.ToArray(), yav.ToArray());
-                var curve4 = chart1.Series[3];
+                var curve4 = chart2.Series[0];
                 curve4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-                curve4.Points.DataBindXY(xfv.ToArray(), ysv.ToArray());       
-
+                curve4.Points.DataBindXY(xfv.ToArray(), ysv.ToArray());     
         }             
+
         private void Form1_Load(object sender, EventArgs e)
         {
             var curve1 = chart1.Series.Add("Load");
             var curve2 = chart1.Series.Add("Rebound");
             var curve3 = chart1.Series.Add("Average");
-            var curve4 = chart1.Series.Add("Stiffness");
-        }
-
-        
-
+            var curve4 = chart2.Series.Add("Stiffness");
+        }              
+        //Usşing for mouse data read
         System.Drawing.Point? prevPosition = null;
         ToolTip tooltip = new ToolTip();
 
-        private void chart1_MouseMove(object sender, MouseEventArgs e)
+        private void chart2_MouseMove(object sender, MouseEventArgs e)
         {
             var pos = e.Location;
             if (prevPosition.HasValue && pos == prevPosition.Value)
                 return;
             tooltip.RemoveAll();
             prevPosition = pos;
-            var results = chart1.HitTest(pos.X, pos.Y, false, ChartElementType.DataPoint); // set ChartElementType.PlottingArea for full area, not only DataPoints
+            var results = chart2.HitTest(pos.X, pos.Y, false, ChartElementType.DataPoint); // set ChartElementType.PlottingArea for full area, not only DataPoints
             foreach (var result in results)
             {
                 if (result.ChartElementType == ChartElementType.DataPoint) // set ChartElementType.PlottingArea for full area, not only DataPoints
                 {
                     var yVal = result.ChartArea.AxisY.PixelPositionToValue(pos.Y);
                     var xVal = result.ChartArea.AxisX.PixelPositionToValue(pos.X);
-                    tooltip.Show(((double)xVal).ToString("0.###")+" , "+ ((double)yVal).ToString("0.###"), chart1, pos.X, pos.Y - 15);
+                    tooltip.Show(((double)xVal).ToString("0.###") + " , " + ((double)yVal).ToString("0.###"), chart2, pos.X, pos.Y - 15);
                 }
             }
         }

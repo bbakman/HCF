@@ -57,10 +57,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BulkDataOperation.cs" />
-    <Compile Include="linspace.cs" />
-    <Compile Include="Polynamial.cs" />
-    <Compile Include="Excel.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
